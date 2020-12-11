@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
+      "name": "alexa-athan:index.handler (nodejs10.x)",
+      "invokeTarget": {
+        "target": "code",
+        "projectRoot": "serverlessrepo-faraaz-pra-alexaskillskitnodejsfact-1O1LUMNMDY68O",
+        "lambdaHandler": "index.handler"
+      },
+      "lambda": {
+        "runtime": "nodejs10.x",
+        "payload": {},
+        "environmentVariables": {}
+      }
+    }
+  ]
+}

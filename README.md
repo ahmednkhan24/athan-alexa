@@ -15,3 +15,7 @@ https://www.youtube.com/watch?v=FINV-VmCXms&ab_channel=AmazonWebServices
 https://www.youtube.com/watch?v=ld9FmI5-h8U&feature=youtu.be&ab_channel=AmazonWebServices
 
 https://medium.com/optimum-technical-labs-llp/solution-for-error-the-trigger-setting-for-the-lambda-arn-aws-lambda-us-east-xxxx-is-invalid-30714bbab1b8
+
+https://s3.amazonaws.com/webappvui/skillcode/v2/index.html
+
+http://api.aladhan.com/v1/timings?latitude=42.01799659277165&longitude=-88.20016064860027&method=2&school=1
