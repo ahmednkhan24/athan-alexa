@@ -1,8 +1,5 @@
-// Lambda Function code for Alexa.
-// Paste this into your index.js file.
-
 const Alexa = require('ask-sdk-core');
-const https = require('https');
+const http = require('http');
 
 const invocationName = 'prayer times';
 
@@ -10,18 +7,14 @@ const invocationName = 'prayer times';
 //   Alexa will track attributes for you, by default only during the lifespan of your session.
 //   The history[] array will track previous request(s), used for contextual Help/Yes/No handling.
 //   Set up DynamoDB persistence to have the skill save and reload these attributes between skill sessions.
-
 function getMemoryAttributes() {
   const memoryAttributes = {
     history: [],
-
     // The remaining attributes will be useful after DynamoDB persistence is configured
     launchCount: 0,
     lastUseTimestamp: 0,
-
     lastSpeechOutput: {},
     nextIntent: []
-
     // "favoriteColor":"",
     // "name":"",
     // "namePronounce":"",
@@ -40,7 +33,6 @@ function getMemoryAttributes() {
 const maxHistorySize = 20; // remember only latest 20 intents
 
 // 1. Intent Handlers =============================================
-
 const AMAZON_CancelIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
@@ -50,46 +42,9 @@ const AMAZON_CancelIntent_Handler = {
     );
   },
   handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-    let say = 'Okay, talk to you later! ';
-
-    return responseBuilder.speak(say).withShouldEndSession(true).getResponse();
-  }
-};
-
-const AMAZON_HelpIntent_Handler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    return (
-      request.type === 'IntentRequest' &&
-      request.intent.name === 'AMAZON.HelpIntent'
-    );
-  },
-  handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-    let intents = getCustomIntents();
-    let sampleIntent = randomElement(intents);
-
-    let say = 'You asked for help. ';
-
-    // let previousIntent = getPreviousIntent(sessionAttributes);
-    // if (previousIntent && !handlerInput.requestEnvelope.session.new) {
-    //     say += 'Your last intent was ' + previousIntent + '. ';
-    // }
-    // say +=  'I understand  ' + intents.length + ' intents, '
-
-    say +=
-      ' Here something you can ask me, ' + getSampleUtterance(sampleIntent);
-
-    return responseBuilder
-      .speak(say)
-      .reprompt('try again, ' + say)
+    return handlerInput.responseBuilder
+      .speak('Okay, talk to you later!')
+      .withShouldEndSession(true)
       .getResponse();
   }
 };
@@ -103,32 +58,28 @@ const AMAZON_StopIntent_Handler = {
     );
   },
   handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-    let say = 'Okay, talk to you later! ';
-
-    return responseBuilder.speak(say).withShouldEndSession(true).getResponse();
+    return handlerInput.responseBuilder
+      .speak('Okay, talk to you later!')
+      .withShouldEndSession(true)
+      .getResponse();
   }
 };
 
-const HelloWorldIntent_Handler = {
+const AMAZON_HelpIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
       request.type === 'IntentRequest' &&
-      request.intent.name === 'HelloWorldIntent'
+      request.intent.name === 'AMAZON.HelpIntent'
     );
   },
   handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let sampleIntent = randomElement(getCustomIntents());
+    let say = 'You asked for help.';
+    say +=
+      ' Heres something you can ask me, ' + getSampleUtterance(sampleIntent);
 
-    let say = 'Hello from HelloWorldIntent. ';
-
-    return responseBuilder
+    return handlerInput.responseBuilder
       .speak(say)
       .reprompt('try again, ' + say)
       .getResponse();
@@ -144,9 +95,7 @@ const AMAZON_NavigateHomeIntent_Handler = {
     );
   },
   handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
     const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     let say = 'Hello from AMAZON.NavigateHomeIntent. ';
 
@@ -166,7 +115,6 @@ const AMAZON_FallbackIntent_Handler = {
     );
   },
   handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
     const responseBuilder = handlerInput.responseBuilder;
     let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
@@ -182,6 +130,40 @@ const AMAZON_FallbackIntent_Handler = {
   }
 };
 
+const getHttp = () => {
+  const url =
+    'http://api.aladhan.com/v1/timings?latitude=42.01799659277165&longitude=-88.20016064860027&method=2&school=1';
+  return new Promise((resolve, reject) => {
+    const request = http.get(url, (response) => {
+      response.setEncoding('utf8');
+
+      let returnData = '';
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return reject(
+          new Error(
+            `${response.statusCode}: ${response.req.getHeader('host')} ${
+              response.req.path
+            }`
+          )
+        );
+      }
+
+      response.on('data', (chunk) => {
+        returnData += chunk;
+      });
+
+      response.on('end', () => {
+        resolve(returnData);
+      });
+
+      response.on('error', (error) => {
+        reject(error);
+      });
+    });
+    request.end();
+  });
+};
+
 const SetPrayerTimes_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
@@ -190,17 +172,29 @@ const SetPrayerTimes_Handler = {
       request.intent.name === 'SetPrayerTimes'
     );
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     const responseBuilder = handlerInput.responseBuilder;
     let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     let say = 'Hello from SetPrayerTimes. ';
 
-    return responseBuilder
-      .speak(say)
-      .reprompt('try again, ' + say)
-      .getResponse();
+    const repromptOutput = ' Would you like another fact?';
+
+    try {
+      console.log('requesting data');
+      const response = await getHttp();
+      const json = JSON.parse(response);
+      console.log('times: ', json.data.timings);
+
+      responseBuilder.speak(say).reprompt(repromptOutput);
+    } catch (error) {
+      responseBuilder
+        .speak('I wasnt able to find a fact')
+        .reprompt(repromptOutput);
+    }
+
+    return responseBuilder.getResponse();
   }
 };
 
@@ -251,10 +245,7 @@ const ErrorHandler = {
     return true;
   },
   handle(handlerInput, error) {
-    const request = handlerInput.requestEnvelope.request;
-
     console.log(`Error handled: ${error.message}`);
-    // console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
 
     return handlerInput.responseBuilder
       .speak('Sorry, an error occurred.  Please say again.')
@@ -615,7 +606,6 @@ exports.handler = skillBuilder
     AMAZON_CancelIntent_Handler,
     AMAZON_HelpIntent_Handler,
     AMAZON_StopIntent_Handler,
-    HelloWorldIntent_Handler,
     AMAZON_NavigateHomeIntent_Handler,
     AMAZON_FallbackIntent_Handler,
     SetPrayerTimes_Handler,
