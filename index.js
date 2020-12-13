@@ -1,5 +1,6 @@
 const Alexa = require('ask-sdk-core');
 const http = require('http');
+const athan = require('./api/athan');
 
 const invocationName = 'prayer times';
 
@@ -33,6 +34,91 @@ function getMemoryAttributes() {
 const maxHistorySize = 20; // remember only latest 20 intents
 
 // 1. Intent Handlers =============================================
+const LaunchRequest_Handler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'LaunchRequest';
+  },
+  handle(handlerInput) {
+    const responseBuilder = handlerInput.responseBuilder;
+
+    let say =
+      'hello' +
+      ' and welcome to ' +
+      invocationName +
+      ' ! Say help to hear some options.';
+
+    let skillTitle = capitalize(invocationName);
+
+    return responseBuilder
+      .speak(say)
+      .reprompt('try again, ' + say)
+      .withStandardCard(
+        'Welcome!',
+        'Hello!\nThis is a card for your skill, ' + skillTitle,
+        welcomeCardImg.smallImageUrl,
+        welcomeCardImg.largeImageUrl
+      )
+      .getResponse();
+  }
+};
+
+const SetPrayerTimes_Handler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return (
+      request.type === 'IntentRequest' &&
+      request.intent.name === 'SetPrayerTimes'
+    );
+  },
+  async handle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const responseBuilder = handlerInput.responseBuilder;
+    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    let say = 'Hello from SetPrayerTimes. ';
+
+    const repromptOutput = ' Would you like another fact?';
+
+    const prayersEndpoint =
+      'http://api.aladhan.com/v1/timings?latitude=42.01799659277165&longitude=-88.20016064860027&method=2&school=1';
+
+    const params = {
+      latitude: '42.01799659277165',
+      longitude: '-88.20016064860027',
+      method: 2,
+      school: 1
+    };
+
+    // const alexaApiEndpoint =
+    //   'http://api.amazonalexa.com/v1/alerts/alarms?endpointId=@self';
+
+    try {
+      console.log('requesting data');
+      // const response = await getHttp(prayersEndpoint);
+      const response = await athan.get('/timings', { params });
+      // const json = JSON.parse(response);
+      console.log('response: ', response);
+      //console.log('times: ', json.data.timings);
+
+      // var accessToken =
+      //   handlerInput.requestEnvelope.context.System.user.accessToken;
+      // console.log('access token: ', accessToken);
+
+      // const alarms = await getHttp(alexaApiEndpoint);
+      // console.log('alarms: ', alarms);
+
+      responseBuilder.speak(say).reprompt(repromptOutput);
+    } catch (error) {
+      responseBuilder
+        .speak('I wasnt able to find a fact')
+        .reprompt(repromptOutput);
+    }
+
+    return responseBuilder.getResponse();
+  }
+};
+
 const AMAZON_CancelIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
@@ -126,103 +212,6 @@ const AMAZON_FallbackIntent_Handler = {
           stripSpeak(previousSpeech.outputSpeech)
       )
       .reprompt(stripSpeak(previousSpeech.reprompt))
-      .getResponse();
-  }
-};
-
-const getHttp = () => {
-  const url =
-    'http://api.aladhan.com/v1/timings?latitude=42.01799659277165&longitude=-88.20016064860027&method=2&school=1';
-  return new Promise((resolve, reject) => {
-    const request = http.get(url, (response) => {
-      response.setEncoding('utf8');
-
-      let returnData = '';
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        return reject(
-          new Error(
-            `${response.statusCode}: ${response.req.getHeader('host')} ${
-              response.req.path
-            }`
-          )
-        );
-      }
-
-      response.on('data', (chunk) => {
-        returnData += chunk;
-      });
-
-      response.on('end', () => {
-        resolve(returnData);
-      });
-
-      response.on('error', (error) => {
-        reject(error);
-      });
-    });
-    request.end();
-  });
-};
-
-const SetPrayerTimes_Handler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    return (
-      request.type === 'IntentRequest' &&
-      request.intent.name === 'SetPrayerTimes'
-    );
-  },
-  async handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-    let say = 'Hello from SetPrayerTimes. ';
-
-    const repromptOutput = ' Would you like another fact?';
-
-    try {
-      console.log('requesting data');
-      const response = await getHttp();
-      const json = JSON.parse(response);
-      console.log('times: ', json.data.timings);
-
-      responseBuilder.speak(say).reprompt(repromptOutput);
-    } catch (error) {
-      responseBuilder
-        .speak('I wasnt able to find a fact')
-        .reprompt(repromptOutput);
-    }
-
-    return responseBuilder.getResponse();
-  }
-};
-
-const LaunchRequest_Handler = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
-    return request.type === 'LaunchRequest';
-  },
-  handle(handlerInput) {
-    const responseBuilder = handlerInput.responseBuilder;
-
-    let say =
-      'hello' +
-      ' and welcome to ' +
-      invocationName +
-      ' ! Say help to hear some options.';
-
-    let skillTitle = capitalize(invocationName);
-
-    return responseBuilder
-      .speak(say)
-      .reprompt('try again, ' + say)
-      .withStandardCard(
-        'Welcome!',
-        'Hello!\nThis is a card for your skill, ' + skillTitle,
-        welcomeCardImg.smallImageUrl,
-        welcomeCardImg.largeImageUrl
-      )
       .getResponse();
   }
 };
