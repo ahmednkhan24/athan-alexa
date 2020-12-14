@@ -1,6 +1,7 @@
 const Alexa = require('ask-sdk-core');
-const http = require('http');
+const axios = require('axios');
 const athan = require('./api/athan');
+// const amazon = require('./api/amazon');
 
 const invocationName = 'prayer times';
 
@@ -41,12 +42,20 @@ const LaunchRequest_Handler = {
   },
   handle(handlerInput) {
     const responseBuilder = handlerInput.responseBuilder;
+    const accessToken =
+      handlerInput.requestEnvelope.context.System.user.accessToken;
+
+    if (!accessToken) {
+      const speak =
+        'Please use the Alexa companion app to authenticate with your Amazon account to start using the skill.';
+      return responseBuilder.speak(speak).withLinkAccountCard().getResponse();
+    }
 
     let say =
       'hello' +
       ' and welcome to ' +
       invocationName +
-      ' ! Say help to hear some options.';
+      '! Say help to hear some options.';
 
     let skillTitle = capitalize(invocationName);
 
@@ -72,44 +81,62 @@ const SetPrayerTimes_Handler = {
     );
   },
   async handle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
     const responseBuilder = handlerInput.responseBuilder;
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const accessToken =
+      handlerInput.requestEnvelope.context.System.user.accessToken;
 
-    let say = 'Hello from SetPrayerTimes. ';
+    if (!accessToken) {
+      const speak =
+        'Please use the Alexa companion app to authenticate with your Amazon account to start using the skill.';
+      return responseBuilder.speak(speak).withLinkAccountCard().getResponse();
+    }
+
+    let say = 'Hello from SetPrayerTimes.';
 
     const repromptOutput = ' Would you like another fact?';
 
-    const prayersEndpoint =
-      'http://api.aladhan.com/v1/timings?latitude=42.01799659277165&longitude=-88.20016064860027&method=2&school=1';
-
-    const params = {
+    let params = {
       latitude: '42.01799659277165',
       longitude: '-88.20016064860027',
       method: 2,
       school: 1
     };
 
-    // const alexaApiEndpoint =
-    //   'http://api.amazonalexa.com/v1/alerts/alarms?endpointId=@self';
-
     try {
       console.log('requesting data');
-      // const response = await getHttp(prayersEndpoint);
-      const response = await athan.get('/timings', { params });
-      // const json = JSON.parse(response);
-      console.log('response: ', response);
-      //console.log('times: ', json.data.timings);
+      const athanResponse = await athan.get('/timings', { params });
 
-      // var accessToken =
-      //   handlerInput.requestEnvelope.context.System.user.accessToken;
-      // console.log('access token: ', accessToken);
+      if (athanResponse.status !== 200) {
+        responseBuilder
+          .speak('I wasnt able to find a fact')
+          .reprompt(repromptOutput);
+      }
 
-      // const alarms = await getHttp(alexaApiEndpoint);
-      // console.log('alarms: ', alarms);
+      const times = athanResponse.data.data.timings;
+
+      // const amazonResponse = await amazon.get('/user/profile', {
+      //   params: { access_token: accessToken }
+      // });
+
+      // console.log('amazon data: ', amazonResponse);
+
+      console.log('access token: ', accessToken);
+
+      const amazon = axios.create({
+        baseURL:
+          'https://api.amazonalexa.com/v1/alerts/alarms?endpointId=@self',
+        headers: {
+          Authorization: accessToken
+        }
+      });
+
+      const alarms = await amazon.get();
+
+      console.log('alarms: ', alarms);
 
       responseBuilder.speak(say).reprompt(repromptOutput);
     } catch (error) {
+      console.log('error received: ', error);
       responseBuilder
         .speak('I wasnt able to find a fact')
         .reprompt(repromptOutput);
@@ -612,7 +639,7 @@ exports.handler = skillBuilder
 
   // .withTableName("askMemorySkillTable")
   // .withAutoCreateTable(true)
-
+  // .withApiClient(new Alexa.DefaultApiClient())
   .lambda();
 
 // End of Skill code -------------------------------------------------------------
