@@ -1,7 +1,7 @@
 const Alexa = require('ask-sdk-core');
 const axios = require('axios');
 const athan = require('./api/athan');
-// const amazon = require('./api/amazon');
+const amazon = require('./api/amazon');
 
 const invocationName = 'prayer times';
 
@@ -95,44 +95,60 @@ const SetPrayerTimes_Handler = {
 
     const repromptOutput = ' Would you like another fact?';
 
-    let params = {
-      latitude: '42.01799659277165',
-      longitude: '-88.20016064860027',
-      method: 2,
-      school: 1
-    };
-
     try {
       console.log('requesting data');
-      const athanResponse = await athan.get('/timings', { params });
 
-      if (athanResponse.status !== 200) {
+      // let params = {
+      //   latitude: '42.01799659277165',
+      //   longitude: '-88.20016064860027',
+      //   method: 2,
+      //   school: 1
+      // };
+
+      // const athanResponse = await athan.get('/timings', { params });
+
+      // if (athanResponse.status !== 200) {
+      //   responseBuilder
+      //     .speak('I wasnt able to find a fact')
+      //     .reprompt(repromptOutput);
+      // }
+
+      // const times = athanResponse.data.data.timings;
+
+      const context = handlerInput.requestEnvelope.context;
+
+      const apiEndpoint =
+        handlerInput.requestEnvelope.context.System.apiEndpoint;
+
+      const amazonUserResponse = await amazon.get('/user/profile', {
+        params: { access_token: accessToken }
+      });
+
+      if (amazonUserResponse.status !== 200) {
         responseBuilder
           .speak('I wasnt able to find a fact')
           .reprompt(repromptOutput);
       }
 
-      const times = athanResponse.data.data.timings;
-
-      // const amazonResponse = await amazon.get('/user/profile', {
-      //   params: { access_token: accessToken }
-      // });
-
-      // console.log('amazon data: ', amazonResponse);
-
+      console.log('context: ', context);
+      console.log('amazon user: ', amazonUserResponse);
+      console.log('apiEndpoint: ', apiEndpoint);
       console.log('access token: ', accessToken);
 
-      const amazon = axios.create({
-        baseURL:
-          'https://api.amazonalexa.com/v1/alerts/alarms?endpointId=@self',
-        headers: {
-          Authorization: accessToken
+      const { user_id } = amazonUserResponse.data;
+
+      console.log('user_id: ', user_id);
+
+      const response = await axios.get(
+        `${apiEndpoint}/v1/alerts/reminders?customerId=${user_id}&creatorId=${user_id}`,
+        {
+          headers: {
+            Authorization: accessToken,
+            'Content-Type': 'application/json'
+          }
         }
-      });
-
-      const alarms = await amazon.get();
-
-      console.log('alarms: ', alarms);
+      );
+      console.log('response: ', response);
 
       responseBuilder.speak(say).reprompt(repromptOutput);
     } catch (error) {
