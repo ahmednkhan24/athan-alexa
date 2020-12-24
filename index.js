@@ -5,6 +5,26 @@ const amazon = require('./api/amazon');
 
 const invocationName = 'prayer times';
 
+const messages = {
+  WELCOME:
+    'Welcome to the Reminders API Demo Skill!  You can say "create a reminder" to create a reminder.  What would you like to do?',
+  WHAT_DO_YOU_WANT: 'What would you like to do?',
+  NOTIFY_MISSING_PERMISSIONS:
+    "Please enable Reminder permissions in the Amazon Alexa app using the card I've sent to your Alexa app.",
+  ERROR: 'Uh Oh. Looks like something went wrong.',
+  API_FAILURE: 'There was an error with the Reminders API.',
+  GOODBYE: 'Bye! Thanks for using the Reminders API Skill!',
+  UNHANDLED: "This skill doesn't support that. Please ask something else.",
+  HELP: 'You can use this skill by asking something like: create a reminder?',
+  REMINDER_CREATED: 'OK, I will remind you in 30 seconds.',
+  UNSUPPORTED_DEVICE: "Sorry, this device doesn't support reminders.",
+  WELCOME_REMINDER_COUNT:
+    'Welcome to the Reminders API Demo Skill.  The number of your reminders related to this skill is ',
+  NO_REMINDER: "OK, I won't remind you."
+};
+
+const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
+
 // Session Attributes
 //   Alexa will track attributes for you, by default only during the lifespan of your session.
 //   The history[] array will track previous request(s), used for contextual Help/Yes/No handling.
@@ -40,37 +60,87 @@ const LaunchRequest_Handler = {
     const request = handlerInput.requestEnvelope.request;
     return request.type === 'LaunchRequest';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
+    const requestEnvelope = handlerInput.requestEnvelope;
     const responseBuilder = handlerInput.responseBuilder;
-    const accessToken =
-      handlerInput.requestEnvelope.context.System.user.accessToken;
+    const consentToken = requestEnvelope.context.System.apiAccessToken;
 
-    if (!accessToken) {
-      const speak =
-        'Please use the Alexa companion app to authenticate with your Amazon account to start using the skill.';
-      return responseBuilder.speak(speak).withLinkAccountCard().getResponse();
+    console.log('consent token: ', consentToken);
+
+    if (!consentToken) {
+      // if no consent token, skip getting reminder count
+      return responseBuilder
+        .speak(messages.WELCOME)
+        .reprompt(messages.WHAT_DO_YOU_WANT)
+        .getResponse();
     }
+    try {
+      const client = handlerInput.serviceClientFactory.getReminderManagementServiceClient();
+      const remindersResponse = await client.getReminders();
+      console.log(JSON.stringify(remindersResponse));
 
-    let say =
-      'hello' +
-      ' and welcome to ' +
-      invocationName +
-      '! Say help to hear some options.';
+      // reminders are retained for 3 days after they 'remind' the customer before being deleted
+      const remindersCount = remindersResponse.totalCount;
 
-    let skillTitle = capitalize(invocationName);
+      console.log('total count: ', remindersCount);
 
-    return responseBuilder
-      .speak(say)
-      .reprompt('try again, ' + say)
-      .withStandardCard(
-        'Welcome!',
-        'Hello!\nThis is a card for your skill, ' + skillTitle,
-        welcomeCardImg.smallImageUrl,
-        welcomeCardImg.largeImageUrl
-      )
-      .getResponse();
+      let say =
+        'hello' +
+        ' and welcome to ' +
+        invocationName +
+        '! Say help to hear some options.';
+
+      let skillTitle = capitalize(invocationName);
+
+      return responseBuilder
+        .speak(say)
+        .reprompt('try again, ' + say)
+        .withStandardCard(
+          'Welcome!',
+          'Hello!\nThis is a card for your skill, ' + skillTitle,
+          welcomeCardImg.smallImageUrl,
+          welcomeCardImg.largeImageUrl
+        )
+        .getResponse();
+    } catch (error) {
+      console.log(`error message: ${error.message}`);
+      console.log(`error stack: ${error.stack}`);
+      console.log(`error status code: ${error.statusCode}`);
+      console.log(`error response: ${error.response}`);
+    }
   }
 };
+// handle(handlerInput) {
+//   const responseBuilder = handlerInput.responseBuilder;
+//   const accessToken =
+//     handlerInput.requestEnvelope.context.System.user.accessToken;
+
+//   if (!accessToken) {
+//     const speak =
+//       'Please use the Alexa companion app to authenticate with your Amazon account to start using the skill.';
+//     return responseBuilder.speak(speak).withLinkAccountCard().getResponse();
+//   }
+
+//   let say =
+//     'hello' +
+//     ' and welcome to ' +
+//     invocationName +
+//     '! Say help to hear some options.';
+
+//   let skillTitle = capitalize(invocationName);
+
+//   return responseBuilder
+//     .speak(say)
+//     .reprompt('try again, ' + say)
+//     .withStandardCard(
+//       'Welcome!',
+//       'Hello!\nThis is a card for your skill, ' + skillTitle,
+//       welcomeCardImg.smallImageUrl,
+//       welcomeCardImg.largeImageUrl
+//     )
+//     .getResponse();
+// }
+// };
 
 const SetPrayerTimes_Handler = {
   canHandle(handlerInput) {
@@ -311,128 +381,11 @@ function stripSpeak(str) {
   return str.replace('<speak>', '').replace('</speak>', '');
 }
 
-function getSlotValues(filledSlots) {
-  const slotValues = {};
-
-  Object.keys(filledSlots).forEach((item) => {
-    const name = filledSlots[item].name;
-
-    if (
-      filledSlots[item] &&
-      filledSlots[item].resolutions &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code
-    ) {
-      switch (
-        filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code
-      ) {
-        case 'ER_SUCCESS_MATCH':
-          slotValues[name] = {
-            heardAs: filledSlots[item].value,
-            resolved:
-              filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0]
-                .value.name,
-            ERstatus: 'ER_SUCCESS_MATCH'
-          };
-          break;
-        case 'ER_SUCCESS_NO_MATCH':
-          slotValues[name] = {
-            heardAs: filledSlots[item].value,
-            resolved: '',
-            ERstatus: 'ER_SUCCESS_NO_MATCH'
-          };
-          break;
-        default:
-          break;
-      }
-    } else {
-      slotValues[name] = {
-        heardAs: filledSlots[item].value,
-        resolved: '',
-        ERstatus: ''
-      };
-    }
-  }, this);
-
-  return slotValues;
-}
-
-function getExampleSlotValues(intentName, slotName) {
-  let examples = [];
-  let slotType = '';
-  let slotValuesFull = [];
-
-  let intents = model.interactionModel.languageModel.intents;
-  for (let i = 0; i < intents.length; i++) {
-    if (intents[i].name == intentName) {
-      let slots = intents[i].slots;
-      for (let j = 0; j < slots.length; j++) {
-        if (slots[j].name === slotName) {
-          slotType = slots[j].type;
-        }
-      }
-    }
-  }
-  let types = model.interactionModel.languageModel.types;
-  for (let i = 0; i < types.length; i++) {
-    if (types[i].name === slotType) {
-      slotValuesFull = types[i].values;
-    }
-  }
-
-  examples.push(slotValuesFull[0].name.value);
-  examples.push(slotValuesFull[1].name.value);
-  if (slotValuesFull.length > 2) {
-    examples.push(slotValuesFull[2].name.value);
-  }
-
-  return examples;
-}
-
-function sayArray(myData, penultimateWord = 'and') {
-  let result = '';
-
-  myData.forEach(function (element, index, arr) {
-    if (index === 0) {
-      result = element;
-    } else if (index === myData.length - 1) {
-      result += ` ${penultimateWord} ${element}`;
-    } else {
-      result += `, ${element}`;
-    }
-  });
-  return result;
-}
-function supportsDisplay(handlerInput) {
-  // returns true if the skill is running on a device with a display (Echo Show, Echo Spot, etc.)
-  //  Enable your skill for display as shown here: https://alexa.design/enabledisplay
-  const hasDisplay =
-    handlerInput.requestEnvelope.context &&
-    handlerInput.requestEnvelope.context.System &&
-    handlerInput.requestEnvelope.context.System.device &&
-    handlerInput.requestEnvelope.context.System.device.supportedInterfaces &&
-    handlerInput.requestEnvelope.context.System.device.supportedInterfaces
-      .Display;
-
-  return hasDisplay;
-}
-
 const welcomeCardImg = {
   smallImageUrl:
     'https://s3.amazonaws.com/skill-images-789/cards/card_plane720_480.png',
   largeImageUrl:
     'https://s3.amazonaws.com/skill-images-789/cards/card_plane1200_800.png'
-};
-
-const DisplayImg1 = {
-  title: 'Jet Plane',
-  url: 'https://s3.amazonaws.com/skill-images-789/display/plane340_340.png'
-};
-const DisplayImg2 = {
-  title: 'Starry Sky',
-  url:
-    'https://s3.amazonaws.com/skill-images-789/display/background1024_600.png'
 };
 
 function getCustomIntents() {
@@ -455,42 +408,12 @@ function getSampleUtterance(intent) {
   return randomElement(intent.samples);
 }
 
-function getPreviousIntent(attrs) {
-  if (attrs.history && attrs.history.length > 1) {
-    return attrs.history[attrs.history.length - 2].IntentRequest;
-  } else {
-    return false;
-  }
-}
-
 function getPreviousSpeechOutput(attrs) {
   if (attrs.lastSpeechOutput && attrs.history.length > 1) {
     return attrs.lastSpeechOutput;
   } else {
     return false;
   }
-}
-
-function timeDelta(t1, t2) {
-  const dt1 = new Date(t1);
-  const dt2 = new Date(t2);
-  const timeSpanMS = dt2.getTime() - dt1.getTime();
-  const span = {
-    timeSpanMIN: Math.floor(timeSpanMS / (1000 * 60)),
-    timeSpanHR: Math.floor(timeSpanMS / (1000 * 60 * 60)),
-    timeSpanDAY: Math.floor(timeSpanMS / (1000 * 60 * 60 * 24)),
-    timeSpanDesc: ''
-  };
-
-  if (span.timeSpanHR < 2) {
-    span.timeSpanDesc = span.timeSpanMIN + ' minutes';
-  } else if (span.timeSpanDAY < 2) {
-    span.timeSpanDesc = span.timeSpanHR + ' hours';
-  } else {
-    span.timeSpanDesc = span.timeSpanDAY + ' days';
-  }
-
-  return span;
 }
 
 const InitMemoryAttributesInterceptor = {
@@ -552,86 +475,6 @@ const RequestHistoryInterceptor = {
   }
 };
 
-const RequestPersistenceInterceptor = {
-  process(handlerInput) {
-    if (handlerInput.requestEnvelope.session['new']) {
-      return new Promise((resolve, reject) => {
-        handlerInput.attributesManager
-          .getPersistentAttributes()
-
-          .then((sessionAttributes) => {
-            sessionAttributes = sessionAttributes || {};
-
-            sessionAttributes['launchCount'] += 1;
-
-            handlerInput.attributesManager.setSessionAttributes(
-              sessionAttributes
-            );
-
-            handlerInput.attributesManager
-              .savePersistentAttributes()
-              .then(() => {
-                resolve();
-              })
-              .catch((err) => {
-                reject(err);
-              });
-          });
-      });
-    } // end session['new']
-  }
-};
-
-const ResponseRecordSpeechOutputInterceptor = {
-  process(handlerInput, responseOutput) {
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let lastSpeechOutput = {
-      outputSpeech: responseOutput.outputSpeech.ssml,
-      reprompt: responseOutput.reprompt.outputSpeech.ssml
-    };
-
-    sessionAttributes['lastSpeechOutput'] = lastSpeechOutput;
-
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-  }
-};
-
-const ResponsePersistenceInterceptor = {
-  process(handlerInput, responseOutput) {
-    const ses =
-      typeof responseOutput.shouldEndSession == 'undefined'
-        ? true
-        : responseOutput.shouldEndSession;
-
-    if (
-      ses ||
-      handlerInput.requestEnvelope.request.type == 'SessionEndedRequest'
-    ) {
-      // skill was stopped or timed out
-
-      let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-      sessionAttributes['lastUseTimestamp'] = new Date(
-        handlerInput.requestEnvelope.request.timestamp
-      ).getTime();
-
-      handlerInput.attributesManager.setPersistentAttributes(sessionAttributes);
-
-      return new Promise((resolve, reject) => {
-        handlerInput.attributesManager
-          .savePersistentAttributes()
-          .then(() => {
-            resolve();
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      });
-    }
-  }
-};
-
-// 4. Exports handler function and setup ===================================================
 const skillBuilder = Alexa.SkillBuilders.custom();
 exports.handler = skillBuilder
   .addRequestHandlers(
@@ -647,15 +490,8 @@ exports.handler = skillBuilder
   .addErrorHandlers(ErrorHandler)
   .addRequestInterceptors(InitMemoryAttributesInterceptor)
   .addRequestInterceptors(RequestHistoryInterceptor)
-
-  // .addResponseInterceptors(ResponseRecordSpeechOutputInterceptor)
-
-  // .addRequestInterceptors(RequestPersistenceInterceptor)
-  // .addResponseInterceptors(ResponsePersistenceInterceptor)
-
-  // .withTableName("askMemorySkillTable")
-  // .withAutoCreateTable(true)
-  // .withApiClient(new Alexa.DefaultApiClient())
+  .withApiClient(new Alexa.DefaultApiClient())
+  .withCustomUserAgent('cookbook/reminders/v1')
   .lambda();
 
 // End of Skill code -------------------------------------------------------------
