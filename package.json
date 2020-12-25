@@ -12,6 +12,7 @@
     "ask-sdk-core": "^2.3.0",
     "ask-sdk-model": "^1.11.1",
     "axios": "^0.21.0",
-    "i18next": "^15.0.5"
+    "i18next": "^15.0.5",
+    "moment-timezone": "^0.5.32"
   }
 }

@@ -1,9 +1,5 @@
 const Alexa = require('ask-sdk-core');
-const axios = require('axios');
-const athan = require('./api/athan');
-const amazon = require('./api/amazon');
-
-const invocationName = 'prayer times';
+const generateRequests = require('./logic');
 
 const messages = {
   WELCOME:
@@ -54,62 +50,105 @@ function getMemoryAttributes() {
 
 const maxHistorySize = 20; // remember only latest 20 intents
 
-// 1. Intent Handlers =============================================
 const LaunchRequest_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return request.type === 'LaunchRequest';
   },
   async handle(handlerInput) {
-    const requestEnvelope = handlerInput.requestEnvelope;
-    const responseBuilder = handlerInput.responseBuilder;
-    const consentToken = requestEnvelope.context.System.apiAccessToken;
-
-    console.log('consent token: ', consentToken);
-
-    if (!consentToken) {
-      // if no consent token, skip getting reminder count
-      return responseBuilder
-        .speak(messages.WELCOME)
-        .reprompt(messages.WHAT_DO_YOU_WANT)
-        .getResponse();
-    }
+    const { responseBuilder } = handlerInput;
+    const client = handlerInput.serviceClientFactory.getReminderManagementServiceClient();
+    // const { permissions } = handlerInput.requestEnvelope.context.System.user;
+    // if (permissions && !permissions.consentToken) {
+    //   return responseBuilder
+    //     .speak(messages.NOTIFY_MISSING_PERMISSIONS)
+    //     .withAskForPermissionsConsentCard(PERMISSIONS)
+    //     .getResponse();
+    // }
     try {
-      const client = handlerInput.serviceClientFactory.getReminderManagementServiceClient();
-      const remindersResponse = await client.getReminders();
-      console.log(JSON.stringify(remindersResponse));
+      const reminders = await generateRequests();
 
-      // reminders are retained for 3 days after they 'remind' the customer before being deleted
-      const remindersCount = remindersResponse.totalCount;
+      if (!reminders) {
+        return responseBuilder
+          .speak('An error occurred with the prayer time a.p.i.')
+          .getResponse();
+      }
 
-      console.log('total count: ', remindersCount);
+      console.log('requests: ', JSON.stringify(reminders));
+      reminders.forEach(async (reminderRequest) => {
+        const reminderResponse = await client.createReminder(reminderRequest);
+        console.log(
+          'reminderRequestResponse: ',
+          JSON.stringify(reminderResponse)
+        );
+      });
 
-      let say =
-        'hello' +
-        ' and welcome to ' +
-        invocationName +
-        '! Say help to hear some options.';
-
-      let skillTitle = capitalize(invocationName);
-
-      return responseBuilder
-        .speak(say)
-        .reprompt('try again, ' + say)
-        .withStandardCard(
-          'Welcome!',
-          'Hello!\nThis is a card for your skill, ' + skillTitle,
-          welcomeCardImg.smallImageUrl,
-          welcomeCardImg.largeImageUrl
-        )
-        .getResponse();
+      return responseBuilder.withShouldEndSession(true).getResponse();
+      // return responseBuilder.speak(messages.REMINDER_CREATED).getResponse();
     } catch (error) {
-      console.log(`error message: ${error.message}`);
-      console.log(`error stack: ${error.stack}`);
-      console.log(`error status code: ${error.statusCode}`);
-      console.log(`error response: ${error.response}`);
+      console.log('error: ', error);
+      return responseBuilder
+        .speak('An error occurred creating the reminders')
+        .getResponse();
     }
   }
 };
+// async handle(handlerInput) {
+//   const requestEnvelope = handlerInput.requestEnvelope;
+//   const responseBuilder = handlerInput.responseBuilder;
+//   const consentToken = requestEnvelope.context.System.apiAccessToken;
+
+//   console.log('consent token: ', consentToken);
+//   const interfaces =
+//     requestEnvelope.context.System.device.supportedInterfaces;
+
+//   console.log('interfaces: ', interfaces);
+
+//   const permissions = requestEnvelope.context.System.user.permissions;
+
+//   console.log('permissions: ', permissions);
+
+//   // return responseBuilder
+//   //   .speak(messages.NOTIFY_MISSING_PERMISSIONS)
+//   //   .withAskForPermissionsConsentCard(PERMISSIONS)
+//   //   .getResponse();
+
+//   try {
+//     const client = handlerInput.serviceClientFactory.getReminderManagementServiceClient();
+//     const remindersResponse = await client.getReminders();
+//     console.log(JSON.stringify(remindersResponse));
+
+//     // reminders are retained for 3 days after they 'remind' the customer before being deleted
+//     const remindersCount = remindersResponse.totalCount;
+
+//     console.log('total count: ', remindersCount);
+
+//     let say =
+//       'hello' +
+//       ' and welcome to ' +
+//       invocationName +
+//       '! Say help to hear some options.';
+
+//     let skillTitle = capitalize(invocationName);
+
+//     return responseBuilder
+//       .speak(say)
+//       .reprompt('try again, ' + say)
+//       .withStandardCard(
+//         'Welcome!',
+//         'Hello!\nThis is a card for your skill, ' + skillTitle,
+//         welcomeCardImg.smallImageUrl,
+//         welcomeCardImg.largeImageUrl
+//       )
+//       .getResponse();
+//   } catch (error) {
+//     console.log(`error message: ${error.message}`);
+//     console.log(`error stack: ${error.stack}`);
+//     console.log(`error status code: ${error.statusCode}`);
+//     console.log(`error response: ${error.response}`);
+//   }
+// }
+// };
 // handle(handlerInput) {
 //   const responseBuilder = handlerInput.responseBuilder;
 //   const accessToken =
