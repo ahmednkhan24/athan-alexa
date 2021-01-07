@@ -1,4 +1,4 @@
-const athan = require('../api/athan');
+const athanApi = require('./api');
 
 const fetchPrayers = async () => {
   const params = {
@@ -8,7 +8,7 @@ const fetchPrayers = async () => {
     school: 1 // Hanafi
   };
 
-  const athanResponse = await athan.get('/timings', { params });
+  const athanResponse = await athanApi.get('/timings', { params });
 
   if (athanResponse.status !== 200) {
     return null;
