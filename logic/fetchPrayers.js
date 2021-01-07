@@ -2,13 +2,15 @@ const athanApi = require('./api');
 
 const fetchPrayers = async () => {
   const params = {
-    latitude: '42.01799659277165',
-    longitude: '-88.20016064860027',
+    city: 'Streamwood',
+    state: 'Illinois',
+    country: 'US',
     method: 2, // ISNA
-    school: 1 // Hanafi
+    school: 1, // Hanafi
+    tune: '0,0,0,0,0,0,0,7,0' // add 7 minutes to Isha
   };
 
-  const athanResponse = await athanApi.get('/timings', { params });
+  const athanResponse = await athanApi.get('/timingsByCity', { params });
 
   if (athanResponse.status !== 200) {
     return null;
