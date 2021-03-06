@@ -1,5 +1,5 @@
 const Alexa = require('ask-sdk-core');
-const generateRequests = require('./logic');
+const generateRequests = require('./src');
 
 const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 
