@@ -1,3 +1,7 @@
+# Alexa Athan
+
+Serverless function (AWS Lambda) to set daily Alexa reminders for the five daily prayers.
+
 https://developer.amazon.com/alexa/console/ask/build/custom/amzn1.ask.skill.b2707d76-213a-4a54-9905-84fad81eb7be/development/en_US/dashboard
 
 https://us-east-2.console.aws.amazon.com/lambda/home?region=us-east-2#/functions/serverlessrepo-faraaz-pra-alexaskillskitnodejsfact-1O1LUMNMDY68O?tab=configuration
