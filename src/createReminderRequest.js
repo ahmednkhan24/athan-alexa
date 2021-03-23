@@ -16,7 +16,7 @@ const createReminderRequest = (time, message) => {
       }
     },
     pushNotification: {
-      status: 'DISABLED'
+      status: 'ENABLED'
     }
   };
 };
