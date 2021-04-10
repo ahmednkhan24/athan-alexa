@@ -1,4 +1,5 @@
 module.exports = {
+  PreFajr: '25 minutes left to pray Eesha.',
   Fajr: 'Time to pray Fajr.',
   PreSunrise: '25 minutes left to pray Fajr.',
   Dhuhr: 'Time to pray Dohar.',
