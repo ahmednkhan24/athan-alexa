@@ -1,6 +1,6 @@
 /* eslint-disable */
 const Alexa = require('ask-sdk-core');
-const generateRequests = require('./src');
+const generateRequests = require('./src').main;
 
 const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 

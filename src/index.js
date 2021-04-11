@@ -48,4 +48,8 @@ const main = async () => {
   );
 };
 
-module.exports = main;
+module.exports = {
+  main,
+  createPrayerArray,
+  filterPrayers
+};

@@ -1,0 +1,88 @@
+{
+  "status": 200,
+  "data": {
+    "code": 200,
+    "status": "OK",
+    "data": {
+      "timings": {
+        "Fajr": "04:57",
+        "Sunrise": "06:18",
+        "Dhuhr": "12:54",
+        "Asr": "17:33",
+        "Sunset": "19:30",
+        "Maghrib": "19:30",
+        "Isha": "20:58",
+        "Imsak": "04:47",
+        "Midnight": "00:54"
+      },
+      "date": {
+        "readable": "11 Apr 2021",
+        "timestamp": "1618166864",
+        "hijri": {
+          "date": "28-08-1442",
+          "format": "DD-MM-YYYY",
+          "day": "28",
+          "weekday": {
+            "en": "Al Ahad",
+            "ar": "الاحد"
+          },
+          "month": {
+            "number": 8,
+            "en": "Shaʿbān",
+            "ar": "شَعْبان"
+          },
+          "year": "1442",
+          "designation": {
+            "abbreviated": "AH",
+            "expanded": "Anno Hegirae"
+          },
+          "holidays": []
+        },
+        "gregorian": {
+          "date": "11-04-2021",
+          "format": "DD-MM-YYYY",
+          "day": "11",
+          "weekday": {
+            "en": "Sunday"
+          },
+          "month": {
+            "number": 4,
+            "en": "April"
+          },
+          "year": "2021",
+          "designation": {
+            "abbreviated": "AD",
+            "expanded": "Anno Domini"
+          }
+        }
+      },
+      "meta": {
+        "latitude": 42.0255827,
+        "longitude": -88.1784085,
+        "timezone": "America/Chicago",
+        "method": {
+          "id": 2,
+          "name": "Islamic Society of North America (ISNA)",
+          "params": {
+            "Fajr": 15,
+            "Isha": 15
+          }
+        },
+        "latitudeAdjustmentMethod": "ANGLE_BASED",
+        "midnightMode": "STANDARD",
+        "school": "HANAFI",
+        "offset": {
+          "Imsak": 0,
+          "Fajr": 0,
+          "Sunrise": 0,
+          "Dhuhr": 0,
+          "Asr": 0,
+          "Maghrib": 0,
+          "Sunset": 0,
+          "Isha": "7",
+          "Midnight": 0
+        }
+      }
+    }
+  }
+}
