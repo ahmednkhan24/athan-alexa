@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const { main, filterPrayers } = require('../src');
 const fetchPrayers = require('../src/fetchPrayers');
 const messages = require('../src/messages');
