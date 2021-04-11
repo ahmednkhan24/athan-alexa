@@ -1,3 +1,4 @@
+/* eslint-disable */
 const Alexa = require('ask-sdk-core');
 const generateRequests = require('./src');
 

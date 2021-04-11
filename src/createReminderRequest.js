@@ -1,5 +1,4 @@
-const createReminderRequest = (time, message) => {
-  return {
+const createReminderRequest = (time, message) => ({
     trigger: {
       type: 'SCHEDULED_ABSOLUTE',
       scheduledTime: time
@@ -18,7 +17,6 @@ const createReminderRequest = (time, message) => {
     pushNotification: {
       status: 'DISABLED'
     }
-  };
-};
+  });
 
 module.exports = createReminderRequest;
