@@ -51,11 +51,18 @@ const LaunchRequest_Handler = {
 
       console.log('requests: ', JSON.stringify(reminders));
       reminders.forEach(async (reminderRequest) => {
-        const reminderResponse = await client.createReminder(reminderRequest);
-        console.log(
-          'reminderRequestResponse: ',
-          JSON.stringify(reminderResponse)
-        );
+        try {
+          const reminderResponse = await client.createReminder(reminderRequest);
+          console.log(
+            'reminderRequestResponse: ',
+            JSON.stringify(reminderResponse)
+          );
+        } catch (err) {
+          console.log(
+            'There was an error creating reminder: ',
+            JSON.stringify(reminderRequest)
+          );
+        }
       });
 
       return responseBuilder.withShouldEndSession(true).getResponse();
