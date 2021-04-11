@@ -42,6 +42,7 @@ const main = async () => {
   twentyFiveMinuteReminder(3, 'PreAsr', prayerTimes[3].time);
   twentyFiveMinuteReminder(5, 'PreMaghrib', prayerTimes[5].time);
   twentyFiveMinuteReminder(7, 'PreIsha', prayerTimes[7].time);
+  twentyFiveMinuteReminder(9, 'PreFajr', prayerTimes[0].time);
 
   return prayerTimes.map((prayerTime) =>
     createReminderRequest(prayerTime.time, prayerTime.message)

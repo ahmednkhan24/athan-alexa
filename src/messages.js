@@ -7,5 +7,6 @@ module.exports = {
   PreMaghrib: '25 minutes left to pray Asar.',
   Maghrib: 'Time to pray Maghrib.',
   PreIsha: '25 minutes left to pray Maghrib.',
-  Isha: 'Time to pray Eesha.'
+  Isha: 'Time to pray Eesha.',
+  PreFajr: '25 minutes left to pray Eesha.'
 };

@@ -41,6 +41,10 @@ describe('Index', () => {
     Object.values(messages).forEach((message, index) => {
       const alexaMessage =
         prayerReminders[index].alertInfo.spokenInfo.content[0].text;
+
+      // const alexaTime = prayerReminders[index].trigger.scheduledTime;
+      // console.log(`alexa message: ${alexaMessage}, alexa time: ${alexaTime}\n`);
+
       expect(message).toEqual(alexaMessage);
     });
   });
