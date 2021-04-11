@@ -9,10 +9,10 @@ const messages = require('./messages');
 
 const createPrayerArray = (prayers) =>
   Object.keys(prayers).map((prayer) => ({
-      prayer,
-      time: createMomentTime(prayers[prayer]),
-      message: messages[prayer]
-    }));
+    prayer,
+    time: createMomentTime(prayers[prayer]),
+    message: messages[prayer]
+  }));
 
 const filterPrayers = (prayers) => {
   const toRemove = ['Sunrise', 'Sunset', 'Imsak', 'Midnight'];
