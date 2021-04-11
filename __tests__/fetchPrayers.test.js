@@ -2,8 +2,8 @@ const fetchPrayers = require('../src/fetchPrayers');
 const athanApi = require('../src/api');
 const apiResponse = require('./sampleApiResponse.json');
 
-describe('Fetch Prayers (API call)', () => {
-  it('returns prayer times array', async () => {
+describe('FetchPrayers', () => {
+  it('returns prayer times array from api call', async () => {
     jest.spyOn(athanApi, 'get').mockReturnValueOnce(apiResponse);
 
     const expected = apiResponse.data.data.timings;
