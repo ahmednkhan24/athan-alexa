@@ -7,7 +7,7 @@ const fetchPrayers = async () => {
     country: 'US',
     method: 2, // ISNA
     school: 1, // Hanafi
-    tune: '0,0,0,0,0,0,0,7,0' // add 7 minutes to Isha
+    tune: '0,0,0,0,0,0,0,0,0'
   };
 
   const athanResponse = await athanApi.get('/timingsByCity', { params });
