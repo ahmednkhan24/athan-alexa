@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import Alexa from 'ask-sdk-core';
+import { SkillBuilders, DefaultApiClient } from 'ask-sdk-core';
 import * as intents from './intents';
 
-const skillBuilder = Alexa.SkillBuilders.custom();
+const skillBuilder = SkillBuilders.custom();
 
 export const handler = skillBuilder
   .addRequestHandlers(
@@ -17,6 +17,6 @@ export const handler = skillBuilder
     intents.SessionEndedHandler
   )
   .addErrorHandlers(intents.ErrorHandler)
-  .withApiClient(new Alexa.DefaultApiClient())
+  .withApiClient(new DefaultApiClient())
   .withCustomUserAgent('cookbook/reminders/v1')
   .lambda();
