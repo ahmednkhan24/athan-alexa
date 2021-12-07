@@ -6,7 +6,7 @@ const generateRequests = require('./logic').main;
 
 // const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 
-const LaunchRequest_Handler = {
+export const LaunchRequest_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return request.type === 'LaunchRequest';
@@ -57,7 +57,7 @@ const LaunchRequest_Handler = {
 };
 
 // Custom intent handler
-const SetPrayerTimes_Handler = {
+export const SetPrayerTimes_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
@@ -75,7 +75,7 @@ const SetPrayerTimes_Handler = {
 };
 
 // Required intent handler
-const AMAZON_CancelIntent_Handler = {
+export const AMAZON_CancelIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
@@ -92,7 +92,7 @@ const AMAZON_CancelIntent_Handler = {
 };
 
 // Required intent handler
-const AMAZON_StopIntent_Handler = {
+export const AMAZON_StopIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
@@ -109,7 +109,7 @@ const AMAZON_StopIntent_Handler = {
 };
 
 // Required intent handler
-const AMAZON_HelpIntent_Handler = {
+export const AMAZON_HelpIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
@@ -126,7 +126,7 @@ const AMAZON_HelpIntent_Handler = {
 };
 
 // Required intent handler
-const AMAZON_NavigateHomeIntent_Handler = {
+export const AMAZON_NavigateHomeIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
@@ -143,7 +143,7 @@ const AMAZON_NavigateHomeIntent_Handler = {
 };
 
 // Required intent handler
-const AMAZON_FallbackIntent_Handler = {
+export const AMAZON_FallbackIntent_Handler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return (
@@ -159,7 +159,7 @@ const AMAZON_FallbackIntent_Handler = {
   }
 };
 
-const SessionEndedHandler = {
+export const SessionEndedHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return request.type === 'SessionEndedRequest';
@@ -172,7 +172,7 @@ const SessionEndedHandler = {
   }
 };
 
-const ErrorHandler = {
+export const ErrorHandler = {
   canHandle() {
     return true;
   },
@@ -182,16 +182,4 @@ const ErrorHandler = {
       .withShouldEndSession(true)
       .getResponse();
   }
-};
-
-module.exports = {
-  LaunchRequest_Handler,
-  SetPrayerTimes_Handler,
-  AMAZON_CancelIntent_Handler,
-  AMAZON_StopIntent_Handler,
-  AMAZON_HelpIntent_Handler,
-  AMAZON_NavigateHomeIntent_Handler,
-  AMAZON_FallbackIntent_Handler,
-  SessionEndedHandler,
-  ErrorHandler
 };

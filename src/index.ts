@@ -1,10 +1,11 @@
+/* eslint-disable import/prefer-default-export */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const Alexa = require('ask-sdk-core');
-const intents = require('./intents');
+import Alexa from 'ask-sdk-core';
+import * as intents from './intents';
 
 const skillBuilder = Alexa.SkillBuilders.custom();
 
-exports.handler = skillBuilder
+export const handler = skillBuilder
   .addRequestHandlers(
     intents.AMAZON_CancelIntent_Handler,
     intents.AMAZON_HelpIntent_Handler,
