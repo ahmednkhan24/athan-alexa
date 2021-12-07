@@ -1,4 +1,4 @@
-const athanApi = require('./api');
+import athanApi from './api';
 
 const fetchPrayers = async () => {
   const params = {
@@ -20,4 +20,4 @@ const fetchPrayers = async () => {
   return timings;
 };
 
-module.exports = fetchPrayers;
+export default fetchPrayers;
