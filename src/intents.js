@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
-const generateRequests = require('./src/logic').main;
+// eslint-disable-next-line import/no-unresolved
+const generateRequests = require('./logic').main;
 
 // const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 

@@ -16,7 +16,8 @@
     "typecheck": "tsc --project tsconfig.prod.json",
     "precompile": "rm -rf dist",
     "compile": "tsc -p tsconfig.prod.json",
-    "dev": "node dev.js"
+    "predev": "npm run compile",
+    "dev": "node ./dist/dev.js"
   },
   "dependencies": {
     "ask-sdk-core": "^2.3.0",

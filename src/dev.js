@@ -1,4 +1,5 @@
-const { main } = require('./src/logic');
+// eslint-disable-next-line import/no-unresolved
+const { main } = require('./logic');
 
 const dev = async () => {
   const requests = await main();
