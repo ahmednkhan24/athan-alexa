@@ -32,10 +32,7 @@ jobs:
           cd dist && npm install --production && cd ../
 
       - name: zip
-        uses: montudor/action-zip@v1
-        with:
-          entryPoint: dist
-          args: zip -qq -r bundle.zip ./
+        run: zip -r bundle.zip dist
 
       - name: default deploy
         uses: appleboy/lambda-action@master
