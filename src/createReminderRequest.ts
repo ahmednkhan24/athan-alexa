@@ -1,4 +1,4 @@
-const createReminderRequest = (time, message) => ({
+const createReminderRequest = (time: string, message: string) => ({
   trigger: {
     type: 'SCHEDULED_ABSOLUTE',
     scheduledTime: time
@@ -19,4 +19,4 @@ const createReminderRequest = (time, message) => ({
   }
 });
 
-module.exports = createReminderRequest;
+export default createReminderRequest;
