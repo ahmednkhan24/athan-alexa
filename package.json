@@ -11,6 +11,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage",
+    "lint": "eslint 'src/**/*.{js,ts}' --fix",
+    "pretty": "prettier 'src/**/*.{js,ts}' --write",
+    "typecheck": "tsc --project tsconfig.prod.json",
     "precompile": "rm -rf dist",
     "compile": "tsc -p tsconfig.prod.json",
     "dev": "node dev.js"
