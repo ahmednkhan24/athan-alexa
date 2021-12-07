@@ -7,9 +7,10 @@ module.exports = {
   },
   extends: ['airbnb-base', 'prettier'],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaVersion: 12
   },
+  ignorePatterns: ['coverage', 'dist', 'node_modules'],
   rules: {
-    "no-param-reassign": ["error", { "props": false }]
-  },
+    'no-param-reassign': ['error', { props: false }]
+  }
 };
