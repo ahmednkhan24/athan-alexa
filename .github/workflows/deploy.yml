@@ -29,6 +29,8 @@ jobs:
           npm run pretty
           npm run typecheck
           npm run compile
+          rm -rf node_modules
+          npm install --production
 
       - name: zip
         uses: montudor/action-zip@v1
