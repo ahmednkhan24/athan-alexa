@@ -1,4 +1,4 @@
-const { main } = require('./src');
+const { main } = require('./src/logic');
 
 const dev = async () => {
   const requests = await main();
