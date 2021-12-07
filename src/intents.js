@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-console */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
-const generateRequests = require('./src').main;
+const generateRequests = require('./logic').main;
 
 // const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 

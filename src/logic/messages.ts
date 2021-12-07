@@ -1,4 +1,4 @@
-module.exports = {
+const messages = {
   Fajr: 'Time to pray Fajr.',
   PreSunrise: '25 minutes left to pray Fajr.',
   Dhuhr: 'Time to pray Dohar.',
@@ -10,3 +10,5 @@ module.exports = {
   Isha: 'Time to pray Eesha.',
   PreFajr: '25 minutes left to pray Eesha.'
 };
+
+export default messages;

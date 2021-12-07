@@ -1,4 +1,19 @@
-const athanApi = require('./api');
+import athanApi from './api';
+
+export type Timings = {
+  Sunrise: string;
+  Fajr: string;
+  Dhuhr: string;
+  Asr: string;
+  Maghrib: string;
+  Isha: string;
+};
+
+export type AllTimings = Timings & {
+  Sunset: string;
+  Imsak: string;
+  Midnight: string;
+};
 
 const fetchPrayers = async () => {
   const params = {
@@ -17,7 +32,7 @@ const fetchPrayers = async () => {
   }
   const { timings } = athanResponse.data.data;
 
-  return timings;
+  return timings as AllTimings;
 };
 
-module.exports = fetchPrayers;
+export default fetchPrayers;

@@ -1,13 +1,25 @@
 {
-  "name": "fact",
+  "name": "athan-alexa",
   "version": "1.0.0",
-  "description": "",
+  "description": "Alexa skill to set athan reminders",
+  "author": "ahmednkhan24",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahmednkhan24/athan-alexa"
+  },
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "lint": "eslint 'src/**/*.{js,ts}' --fix",
+    "pretty": "prettier 'src/**/*.{js,ts}' --write",
+    "typecheck": "tsc --project tsconfig.prod.json",
+    "precompile": "rm -rf dist",
+    "compile": "tsc -p tsconfig.prod.json",
+    "postcompile": "cp package.json dist && cp package-lock.json dist",
+    "predev": "npm run compile",
+    "dev": "node ./dist/dev.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "ask-sdk-core": "^2.3.0",
     "ask-sdk-model": "^1.11.1",
@@ -16,11 +28,16 @@
     "moment-timezone": "^0.5.32"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/parser": "^5.6.0",
     "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.22.1",
-    "jest": "^26.6.3",
-    "prettier": "^2.2.1"
+    "jest": "27.1.0",
+    "prettier": "^2.2.1",
+    "ts-jest": "^27.1.0",
+    "typescript": "^4.5.2"
   }
 }

@@ -1,9 +1,9 @@
-const { main, filterPrayers } = require('../src');
-const fetchPrayers = require('../src/fetchPrayers');
-const messages = require('../src/messages');
-const apiResponse = require('./sampleApiResponse.json');
+import { main, filterPrayers } from '.';
+import fetchPrayers from './fetchPrayers';
+import messages from './messages';
+import apiResponse from './sampleApiResponse.json';
 
-jest.mock('../src/fetchPrayers', () => jest.fn());
+jest.mock('./fetchPrayers', () => jest.fn());
 
 describe('Index', () => {
   // setups because we are mutating the original array using `delete`
@@ -14,7 +14,9 @@ describe('Index', () => {
   });
 
   beforeEach(() => {
-    fetchPrayers.mockImplementation(() => apiResponse.data.data.timings);
+    (fetchPrayers as any).mockImplementation(
+      () => apiResponse.data.data.timings
+    );
   });
 
   afterEach(() => {

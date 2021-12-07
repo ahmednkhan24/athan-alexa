@@ -1,8 +1,8 @@
-const {
+import {
   createMomentObject,
   createMomentTime,
   subtractAndFormat
-} = require('../src/dateAndTime');
+} from './dateAndTime';
 
 describe('dateAndTime', () => {
   it('createMomentTime hour < 12', () => {
