@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
-const generateRequests = require('./logic').main;
+import { main as generateRequests } from './logic';
 
 // const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 
