@@ -1,26 +1,26 @@
-const fetchPrayerTimes = require('./fetchPrayers');
-const {
+import fetchPrayerTimes, { Timings, AllTimings } from './fetchPrayers';
+import {
   createMomentObject,
   createMomentTime,
   subtractAndFormat
-} = require('./dateAndTime');
-const createReminderRequest = require('./createReminderRequest');
-const messages = require('./messages');
+} from './dateAndTime';
+import createReminderRequest from './createReminderRequest';
+import messages from './messages';
 
-const createPrayerArray = (prayers) =>
+export const createPrayerArray = (prayers: Timings) =>
   Object.keys(prayers).map((prayer) => ({
     prayer,
     time: createMomentTime(prayers[prayer]),
-    message: messages[prayer]
+    message: messages[prayer] as string
   }));
 
-const filterPrayers = (prayers) => {
+export const filterPrayers = (prayers: AllTimings): Timings => {
   const toRemove = ['Sunrise', 'Sunset', 'Imsak', 'Midnight'];
   toRemove.forEach((value) => delete prayers[value]);
   return prayers;
 };
 
-const main = async () => {
+export const main = async () => {
   const apiTimes = await fetchPrayerTimes();
   if (!apiTimes) {
     return null;
@@ -30,7 +30,11 @@ const main = async () => {
   const filteredPrayers = filterPrayers(apiTimes);
   const prayerTimes = createPrayerArray(filteredPrayers);
 
-  const twentyFiveMinuteReminder = (index, prayer, time) => {
+  const twentyFiveMinuteReminder = (
+    index: number,
+    prayer: string,
+    time: string
+  ) => {
     prayerTimes.splice(index, 0, {
       prayer,
       time: subtractAndFormat(createMomentObject(time), 25),
@@ -47,10 +51,4 @@ const main = async () => {
   return prayerTimes.map((prayerTime) =>
     createReminderRequest(prayerTime.time, prayerTime.message)
   );
-};
-
-module.exports = {
-  main,
-  createPrayerArray,
-  filterPrayers
 };
