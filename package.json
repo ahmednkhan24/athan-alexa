@@ -16,7 +16,6 @@
     "typecheck": "tsc --project tsconfig.prod.json",
     "precompile": "rm -rf dist",
     "compile": "tsc -p tsconfig.prod.json",
-    "postcompile": "cp package.json dist && cp package-lock.json dist",
     "predev": "npm run compile",
     "dev": "node ./dist/dev.js"
   },
