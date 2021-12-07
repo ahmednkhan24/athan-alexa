@@ -1,9 +1,6 @@
 import moment, { Moment } from 'moment-timezone';
 
-export const subtractAndFormat = (
-  momentTime: Moment,
-  minutesToSubtract: number = 0
-) =>
+export const subtractAndFormat = (momentTime: Moment, minutesToSubtract = 0) =>
   momentTime
     .subtract(minutesToSubtract, 'minutes')
     .format('YYYY-MM-DDTHH:mm:ss');

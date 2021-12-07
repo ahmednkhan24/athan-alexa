@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const Alexa = require('ask-sdk-core');
 const intents = require('./intents');
 
