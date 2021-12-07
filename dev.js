@@ -1,4 +1,4 @@
-const { main } = require('./src/main');
+const { main } = require('./src');
 
 const dev = async () => {
   const requests = await main();

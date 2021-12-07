@@ -1,6 +1,6 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
-const generateRequests = require('./src/main').main;
+const generateRequests = require('./src').main;
 
 // const PERMISSIONS = ['alexa::alerts:reminders:skill:readwrite'];
 
