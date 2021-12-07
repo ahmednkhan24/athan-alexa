@@ -2,7 +2,7 @@ name: Deploy Lambda
 
 on:
   push:
-    branches: [deploy]
+    branches: [deploy, typescript]
 
 jobs:
   deploy:
@@ -19,13 +19,21 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm test
+
+      - name: lint, pretty, typecheck, compile, prod install
+        run: |
+          npm ci
+          npm test
+          npm run lint
+          npm run pretty
+          npm run typecheck
+          npm run compile
+          cd dist && npm install --production && cd ../
 
       - name: zip
         uses: montudor/action-zip@v0.1.0
         with:
-          args: zip -qq -r ./bundle.zip ./
+          args: zip -qq -r ./bundle.zip ./dist
 
       - name: default deploy
         uses: appleboy/lambda-action@master

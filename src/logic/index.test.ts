@@ -1,4 +1,4 @@
-import { main, filterPrayers } from ".";
+import { main, filterPrayers } from '.';
 import fetchPrayers from './fetchPrayers';
 import messages from './messages';
 import apiResponse from './sampleApiResponse.json';
