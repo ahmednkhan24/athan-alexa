@@ -40,5 +40,5 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-2
-          function_name: serverlessrepo-faraaz-pra-alexaskillskitnodejsfact-1O1LUMNMDY68O
+          function_name: athan-alexa-lambda-function
           zip_file: bundle.zip
