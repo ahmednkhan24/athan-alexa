@@ -21,7 +21,7 @@ const fetchPrayers = async () => {
     state: 'Illinois',
     country: 'US',
     method: 2, // ISNA
-    school: 0, // Standard; 1 -> Hanafi
+    school: 1, // Standard -> 0; 1 -> Hanafi
     tune: '0,0,0,0,0,0,0,0,0'
   };
 
